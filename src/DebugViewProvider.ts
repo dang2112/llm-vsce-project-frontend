@@ -35,13 +35,82 @@ export class DebugViewProvider implements vscode.WebviewViewProvider {
 
     private async handleDebugRequest(
         webviewView: vscode.WebviewView,
+
         message: {
             sourceCode: string;
             errorLog: string;
         }
+
     ) {
 
-        // we'll implement this next
+        try {
+
+            const response = await fetch(
+                "http://127.0.0.1:8000/debug",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body: JSON.stringify({
+
+                        source_code:
+                            message.sourceCode,
+
+                        error_log:
+                            message.errorLog,
+
+                        filename:
+                            "unknown.py"
+                    })
+                }
+            );
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    `Backend returned ${response.status}`
+                );
+            }
+
+
+            const data =
+                await response.json() as {
+                    explanation: string
+                };
+
+
+            await webviewView.webview.postMessage({
+
+                type: "debugResult",
+
+                explanation:
+                    data.explanation
+            });
+
+        }
+
+        catch (error) {
+
+            let message = "Unknown error";
+
+
+            if (error instanceof Error) {
+                message = error.message;
+            }
+
+
+            await webviewView.webview.postMessage({
+
+                type: "debugError",
+
+                error: message
+            });
+        }
     }
 
 

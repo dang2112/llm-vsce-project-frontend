@@ -3,25 +3,29 @@
 import * as vscode from 'vscode'; //VSC API, read editor state and call localhost
 //later use this to read workspace files and invoke tools
 
-// This method is called when your extension is activated
-// Your extension is activated the very first time the command is executed
-export function activate(context: vscode.ExtensionContext) {
+import { DebugViewProvider } from "./DebugViewProvider";
 
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "llm-vsce-project-frontend" is now active!');
 
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
-	const disposable = vscode.commands.registerCommand('llm-vsce-project-frontend.helloWorld', () => {
-		// The code you place here will be executed every time your command is executed
-		// Display a message box to the user
-		vscode.window.showInformationMessage('Hello World from llm-vsce-project-frontend!');
-	});
+export function activate(
+    context: vscode.ExtensionContext
+) {
 
-	context.subscriptions.push(disposable);
+    const provider =
+        new DebugViewProvider(
+            context.extensionUri
+        );
+
+
+    context.subscriptions.push(
+
+        vscode.window.registerWebviewViewProvider(
+
+            DebugViewProvider.viewType, //matches ID contributed in package.json
+
+            provider
+        )
+    );
 }
 
-// This method is called when your extension is deactivated
+
 export function deactivate() {}
