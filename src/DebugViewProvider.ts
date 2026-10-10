@@ -57,14 +57,18 @@ export class DebugViewProvider implements vscode.WebviewViewProvider {
 
                     body: JSON.stringify({
 
-                        source_code:
-                            message.sourceCode,
+                        problem: {
+                            error_log: message.errorLog
+                        },
 
-                        error_log:
-                            message.errorLog,
-
-                        filename:
-                            "unknown.py"
+                        context: {
+                            files: [
+                                {
+                                    path: "unknown.py",
+                                    content: message.sourceCode
+                                }
+                            ]
+                        }
                     })
                 }
             );
